@@ -28,12 +28,11 @@ class UserController extends Controller
         return view('user.index', [
             'breadcrumb' => $breadcrumb,
             'page' => $page,
-            'level' => $level,
-            'activeMenu' => $activeMenu
-
+            'activeMenu' => $activeMenu,
+            'level' => $level
         ]);
     }
-    
+
     // Ambil data user dalam bentuk json untuk datatables 
     public function list(Request $request)
     {
@@ -72,9 +71,10 @@ class UserController extends Controller
             'title' => 'Tambah user baru'
         ];
 
-        $level = LevelModel::all(); // ambil data level untuk ditampilkan di form
         $activeMenu = 'user'; // set menu yang sedang aktif
 
+        $level = LevelModel::all(); // ambil data level untuk ditampilkan di form
+        
         return view('user.create', [
             'breadcrumb' => $breadcrumb,
             'page' => $page,
