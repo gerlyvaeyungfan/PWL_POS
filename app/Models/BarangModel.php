@@ -12,7 +12,7 @@ class BarangModel extends Model
 
     protected $table = 'm_barang'; // Nama tabel yang digunakan oleh model ini
     protected $primaryKey = 'barang_id'; // Primary key dari tabel
-    protected $fillable = ['barang_kode', 'barang_nama', 'kategori_id', 'harga_beli', 'harga_jual']; // Kolom yang dapat diisi
+    protected $fillable = ['kategori_id', 'barang_kode', 'barang_nama', 'harga_beli', 'harga_jual']; // Kolom yang dapat diisi
 
     // Relasi ke KategoriModel (1 Barang hanya memiliki 1 Kategori)
     public function kategori()
