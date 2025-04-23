@@ -59,16 +59,14 @@
             $('#myModal').modal('show');
         });
     }
+    var dataLevel;
     $(document).ready(function() {
-        var dataLevel = $('#table_level').DataTable({
+        dataLevel = $('#table_level').DataTable({
             serverSide: true,
             ajax: {
                 url: "{{ url('level/list') }}",
                 dataType: "json",
                 type: "POST",
-                "data": function(d) {
-                    d.level_id = $('#level_id').val();
-                }
             },
             columns: [
                 {
