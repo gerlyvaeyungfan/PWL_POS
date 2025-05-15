@@ -1,3 +1,10 @@
+@php
+    // Jika variabel $breadcrumb belum ada, isi dengan default
+    $breadcrumb = $breadcrumb ?? (object)[
+        'title' => 'Dashboard',
+        'list' => ['Home', 'Dashboard']
+    ];
+@endphp
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">

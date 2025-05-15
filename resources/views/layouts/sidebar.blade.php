@@ -1,3 +1,6 @@
+@php
+    $activeMenu = $activeMenu ?? 'dashboard';
+@endphp
 <div class="sidebar">
     <!-- SidebarSearch Form -->
     <div class="form-inline mt-2">
@@ -18,8 +21,8 @@
                 <a href="{{ url('/') }}" class="nav-link {{ ($activeMenu == 'dashboard') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-tachometer-alt"></i>
                     <p>Dashboard</p>
-                </a>
-            </li>
+                </a>                
+            </li>            
 
             <li class="nav-header">Data Pengguna</li>
             <li class="nav-item">

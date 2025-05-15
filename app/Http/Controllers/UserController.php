@@ -64,6 +64,14 @@ class UserController extends Controller
         ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
         ->make(true);
     }
+    public function showAjax($id)
+    {
+        $user = UserModel::with('level')->find($id);
+        $level = LevelModel::all(); // sesuaikan nama model jika berbeda
+
+        return view('user.show_ajax', compact('user', 'level'));
+    }
+
 
     // Menampilkan halaman form tambah user dengan Ajax
     public function create_ajax()
