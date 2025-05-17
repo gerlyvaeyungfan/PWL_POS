@@ -18,11 +18,12 @@ Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
-     // artinya semua route di dalam group ini harus login dulu
+    // artinya semua route di dalam group ini harus login dulu
     Route::get('/', [WelcomeController::class, 'index']);
 
-    //route CRUD user
+    // route CRUD user
     Route::middleware(['authorize:ADM'])->prefix('user')->group(function () {
+    // artinya semua route di dalam gruop ini harus punya role ADM (Administrator)
         Route::get('/', [UserController::class, 'index']); // menampilkan halaman awal user
         Route::post("/list", [UserController::class, 'list']); // menampilkan data user dalam bentuk json untuk datatables
         Route::get('/create', [UserController::class, 'create']); // menampilkan halaman form tambah user
@@ -48,8 +49,8 @@ Route::middleware(['auth'])->group(function () {
     });
     
     // route CRUD level
-    // artinya semua route di dalam gruop ini harus punya role ADM (Administrator)
     Route::middleware(['authorize:ADM'])->prefix('level')->group(function () {
+    // artinya semua route di dalam gruop ini harus punya role ADM (Administrator)
         Route::get('/', [LevelController::class, 'index']); // menampilkan halaman awal level
         Route::post('/list', [LevelController::class, 'list']); // menampilkan data level dalam bentuk json untuk datatables
         Route::get('/create', [LevelController::class, 'create']); // menampilkan halaman form tambah level
@@ -76,6 +77,7 @@ Route::middleware(['auth'])->group(function () {
     
     //route CRUD kategori
     Route::middleware(['authorize:ADM,MNG'])->prefix('kategori')->group(function () {
+    // artinya semua route di dalam group ini harus punya role ADM (Administrator) dan MNG (Manager)
         Route::get('/', [KategoriController::class, 'index']); // menampilkan halaman awal kategori
         Route::post("/list", [KategoriController::class, 'list']); // menampilkan data kategori dalam bentuk json untuk datatables
         Route::get('/create', [KategoriController::class, 'create']); // menampilkan halaman form tambah kategori
@@ -101,6 +103,7 @@ Route::middleware(['auth'])->group(function () {
     
     //route CRUD supplier
     Route::middleware(['authorize:ADM,MNG'])->prefix('supplier')->group(function () {
+    // artinya semua route di dalam group ini harus punya role ADM (Administrator) dan MNG (Manager)
         Route::get('/', [SupplierController::class, 'index']);
         Route::post('/list', [SupplierController::class, 'list']);
         Route::get('/create', [SupplierController::class, 'create']);
@@ -125,8 +128,8 @@ Route::middleware(['auth'])->group(function () {
     });
     
     //route CRUD barang
-    // artinya semua route di dalam group ini harus punya role ADM (Administrator) dan MNG (Manager)
     Route::middleware(['authorize:ADM,MNG'])->prefix('barang')->group(function () {
+    // artinya semua route di dalam group ini harus punya role ADM (Administrator) dan MNG (Manager)
         Route::get('/', [BarangController::class, 'index']);
         Route::post('/list', [BarangController::class, 'list']);
         Route::get('/create', [BarangController::class, 'create']);
