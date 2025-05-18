@@ -128,30 +128,35 @@ Route::middleware(['auth'])->group(function () {
     });
     
     //route CRUD barang
-    Route::middleware(['authorize:ADM,MNG'])->prefix('barang')->group(function () {
-    // artinya semua route di dalam group ini harus punya role ADM (Administrator) dan MNG (Manager)
+    // Route: Semua level (ADM, MNG, STF) bisa lihat data barang dan detail
+    Route::middleware(['authorize:ADM,MNG,STF,KSR'])->prefix('barang')->group(function () {
         Route::get('/', [BarangController::class, 'index']);
         Route::post('/list', [BarangController::class, 'list']);
+        Route::get('/{id}/show_ajax', [BarangController::class, 'showAjax']);
+    });
+
+    // Route: Hanya ADM dan MNG yang bisa akses fitur tambah/edit/hapus
+    Route::middleware(['authorize:ADM,MNG'])->prefix('barang')->group(function () {
         Route::get('/create', [BarangController::class, 'create']);
         Route::post('/', [BarangController::class, 'store']);
-    
-        // Create dengan ajax
+        
+        // Create dengan Ajax
         Route::get('/create_ajax', [BarangController::class, 'create_ajax']);
         Route::post('/ajax', [BarangController::class, 'store_ajax']);
-    
-        Route::get('/{id}', [BarangController::class, 'show']);
+
         Route::get('/{id}/edit', [BarangController::class, 'edit']);
         Route::put('/{id}', [BarangController::class, 'update']);
-    
-        // Edit dengan ajax
+
+        // Edit dengan Ajax
         Route::get('/{id}/edit_ajax', [BarangController::class, 'edit_ajax']);
         Route::put('/{id}/update_ajax', [BarangController::class, 'update_ajax']);
-    
-        // Delete dengan ajax
+
+        // Delete dengan Ajax
         Route::get('/{id}/delete_ajax', [BarangController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [BarangController::class, 'delete_ajax']);
         Route::delete('/{id}', [BarangController::class, 'destroy']);
-    });    
+    });
+   
 });
 
 /*

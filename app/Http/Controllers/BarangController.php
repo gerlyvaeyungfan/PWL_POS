@@ -89,6 +89,12 @@ class BarangController extends Controller
         }
     }
 
+    public function showAjax($id)
+    {
+        $barang = BarangModel::with('kategori')->find($id);
+        return view('barang.show_ajax', compact('barang'));
+    }
+
     public function edit_ajax(string $id)
     {
         $barang = BarangModel::find($id);
