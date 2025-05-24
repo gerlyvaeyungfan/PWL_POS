@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\LevelModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 
 class LevelController extends Controller
 {
@@ -124,6 +125,82 @@ class LevelController extends Controller
                 'message' => 'Data level berhasil disimpan',
             ]);
         }
+        return redirect('/');
+    }
+
+    public function import(){
+        return view('level.import');
+    }
+
+    // Menampilkan form import level Ajax
+    public function import_ajax(Request $request) {
+        if ($request->ajax() || $request->wantsJson()) {
+            // Validasi file: harus .xlsx dan maksimal 1MB
+            $rules = [
+                'file_level' => ['required', 'mimes:xlsx', 'max:1024']
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            // Ambil file dari request
+            $file = $request->file('file_level');
+
+            // Load file excel
+            $reader = IOFactory::createReader('Xlsx');
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Konversi sheet ke array
+            $data = $sheet->toArray(null, false, true, true);
+            $insert = [];
+
+            // Jika data lebih dari satu baris
+            if (count($data) > 1) {
+                foreach ($data as $baris => $value) {
+                    // Lewati baris header (baris ke-1)
+                    if ($baris > 1) {
+                        $insert[] = [
+                            'level_kode' => $value['A'],
+                            'level_nama' => $value['B'],
+                            'created_at' => now(),
+                        ];
+                    }
+                }
+
+                // Insert data jika ada yang valid
+                if (count($insert) > 0) {
+                    LevelModel::insertOrIgnore($insert);
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Data level berhasil diimport'
+                    ]);
+                }
+
+                // Tidak ada data valid untuk diimport
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang diimport'
+                ]);
+            }
+
+            // Tidak ada data dalam file
+            return response()->json([
+                'status' => false,
+                'message' => 'Tidak ada data yang diimport'
+            ]);
+        }
+
+        // Bukan request AJAX
         return redirect('/');
     }
 

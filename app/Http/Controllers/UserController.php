@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class UserController extends Controller
 {
@@ -104,7 +105,15 @@ class UserController extends Controller
                 ]);
             }
     
-            $user = UserModel::create($request->all());
+            $data = [
+                'level_id' => $request->level_id,
+                'username' => $request->username,
+                'nama'     => $request->nama,
+                'password' => Hash::make($request->password),
+                'created_at' => now()
+            ];
+
+            $user = UserModel::create($data);
 
             if ($user) {
                 return response()->json([
@@ -123,6 +132,86 @@ class UserController extends Controller
                 'message' => 'Data user berhasil disimpan'
             ]);
         }
+    }
+
+    public function import()
+    {
+        return view('user.import');
+    }
+
+    // Menampilkan halaman form import user Ajax
+    public function import_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            // Validasi file: harus .xlsx dan maksimal 1MB
+            $rules = [
+                'file_user' => ['required', 'mimes:xlsx', 'max:1024']
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            // Ambil file dari request
+            $file = $request->file('file_user');
+
+            // Load file excel
+            $reader = IOFactory::createReader('Xlsx');
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Konversi sheet ke array
+            $data = $sheet->toArray(null, false, true, true);
+            $insert = [];
+
+            // Jika data lebih dari satu baris
+            if (count($data) > 1) {
+                foreach ($data as $baris => $value) {
+                    // Lewati baris header (baris ke-1)
+                    if ($baris > 1) {
+                        $insert[] = [
+                            'level_id'  => $value['A'],
+                            'username'  => $value['B'],
+                            'nama'      => $value['C'],
+                            'password'  => hash::make($value['D']), // Enkripsi password
+                            'created_at' => now(),
+                        ];
+                    }
+                }
+
+                // Insert data jika ada yang valid
+                if (count($insert) > 0) {
+                    UserModel::insertOrIgnore($insert);
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Data user berhasil diimport'
+                    ]);
+                }
+
+                // Tidak ada data valid untuk diimport
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang diimport'
+                ]);
+            }
+
+            // Tidak ada data dalam file
+            return response()->json([
+                'status' => false,
+                'message' => 'Tidak ada data yang diimport'
+            ]);
+        }
+
+        // Bukan request AJAX
+        return redirect('/');
     }
 
     // Menampilkan halaman form edit user Ajax
@@ -335,168 +424,4 @@ return redirect('/');
             tabel lain yang terkait dengan data ini');
         }
     }
-
-    // public function index()
-    // {
-    //     $user = UserModel::all(); // ambil semua data dari tabel m_user
-    //     return view('user', ['data' => $user]);
-    // }
-    // public function tambah()
-    // {
-    //     return view('user_tambah');
-    // }
-    // public function tambah_simpan(Request $request)
-    // {
-    //     UserModel::create([
-    //         'username' => $request->username,
-    //         'nama' => $request->nama,
-    //         'password' => Hash::make($request->password),
-    //         'level_id' => $request->level_id,
-    //     ]);
-
-    //     return redirect('/user');
-    // }
-    // public function ubah($id)
-    // {
-    //     $user = UserModel::find($id);
-
-    //     return view('user_ubah', ['data' => $user]);
-    // }
-    // public function ubah_simpan($id, Request $request)
-    // {
-    //     $user = UserModel::find($id);
-        
-    //     $user->username = $request->username;
-    //     $user->nama = $request->nama;
-    //     $user->password = Hash::make($request->password);
-    //     $user->level_id = $request->level_id;
-        
-    //     $user->save();
-
-    //     return redirect('/user');
-    // }
-    // public function hapus($id)
-    // {
-    //     $user = UserModel::find($id);
-    //     $user->delete();
-
-    //     return redirect('/user');
-    // }
-
 }
-
-    // $user = UserModel::create([
-    //     'username' => 'manager11',
-    //     'nama' => 'Manager11',
-    //     'password' => Hash::make('12345'),
-    //     'level_id' => 2,
-    // ]);
-
-    // $user->username = 'manager12';
-
-    // $user->save();
-
-    // $user->wasChanged(); // true
-    // $user->wasChanged('username'); // true
-    // $user->wasChanged(['username', 'level_id']); // true
-    // $user->wasChanged('nama'); // false
-    // dd($user->wasChanged(['nama', 'username'])); // true
-
-    // $user = UserModel::create(
-    //     [
-    //         'username' => 'manager55',
-    //         'nama' => 'Manager55',
-    //         'password' => Hash::make('12345'),
-    //         'level_id' => 2
-    //     ],
-    // );
-    // $user->username = 'manager56';
-
-    // $user->isDirty(); // true
-    // $user->isDirty('username'); // true
-    // $user->isDirty('nama'); // false
-    // $user->isDirty(['nama', 'username']); // true
-
-    // $user->isClean(); // false
-    // $user->isClean('username'); // false
-    // $user->isClean('nama'); // true
-    // $user->isClean(['nama', 'username']); // false
-
-    // $user->save();
-
-    // $user->isDirty(); // false
-    // $user->isClean(); // true
-    // dd($user->isDirty());
-
-
-    // $user = UserModel::firstOrNew(
-    //     [
-    //         'username' => 'manager33',
-    //         'nama' => 'Manager Tiga Tiga',
-    //         'password' => Hash::make('12345'),
-    //         'level_id' => 2
-    //     ],
-    // );
-    // $user->save();
-
-    // return view('user', ['data' => $user]);
-    
-    // $user = UserModel::firstOrCreate(
-    //     [
-    //         'username' => 'manager22',
-    //         'nama' => 'Manager Dua Dua',
-    //         'password' => Hash::make('12345'),
-    //         'level_id' => 2
-    //     ],
-    // );
-    // return view('user', ['data' => $user]);
-    
-    // $user = UserModel::where('level_id', 2)->count();
-    // // dd($user);
-    // return view('user', ['data' => $user]);
-
-    // $user = UserModel::where('username', 'manager9')->firstOrFail();
-    // return view('user', ['data' => $user]);
-
-    // $user = UserModel::findOrFail(1);
-    // return view('user', ['data' => $user]);
-
-    // $user = UserModel::findOr(1, ['username', 'nama'], function(){
-    //     abort(404);
-    // });
-    // return view('user', ['data' => $user]);
-
-    // $user = UserModel::firstWhere('level_id', 1);
-    // return view('user', ['data' => $user]);
-
-    // $user = UserModel::where('level_id', 1)->first();
-    // return view('user', ['data' => $user]);
-
-    // $user = UserModel::find(1);
-    // return view('user', ['data' => $user]);
-
-    // tambah data user dengan Eloquent Model
-    // $data = [
-    //     'username' => 'customer-1',
-    //     'nama' => 'Pelanggan',
-    //     'password' => Hash::make('12345'),
-    //     'level_id' => 4
-    // ];
-    // UserModel::insert($data); // tambahkan data ke tabel m_user
-
-    // $data = [
-    //     'nama' => 'Pelanggan Pertama',
-    // ];
-    // UserModel::where('username', 'customer-1')->update($data); // update data user
-
-    // $data = [
-    //     'level_id' => 2,
-    //     'username' => 'manager_tiga',
-    //     'nama' => 'Manager 3',
-    //     'password' => Hash::make('12345')
-    // ];
-    // UserModel::create($data); // update data user
-
-    // // coba akses model UserModel
-    // $user = UserModel::all(); // ambil semua data dari tabel m_user
-    // return view('user', ['data' => $user]);

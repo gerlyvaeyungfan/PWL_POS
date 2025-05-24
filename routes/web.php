@@ -49,6 +49,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}/delete_ajax', [UserController::class, 'delete_ajax']); // menghapus data user ajax
         Route::delete('/{id}', [UserController::class, 'destroy']); // menghapus data user
         Route::get('/{id}/show_ajax', [UserController::class, 'showAjax']);
+
+        // Routes import dengan Ajax untuk User
+        Route::get('/import', [UserController::class, 'import']);
+        Route::post('/import_ajax', [UserController::class, 'import_ajax']);
     });
     
     // route CRUD level
@@ -75,6 +79,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/delete_ajax', [LevelController::class, 'confirm_ajax']); // menampilkan form confirm delete level ajax
         Route::delete('/{id}/delete_ajax', [LevelController::class, 'delete_ajax']); // menghapus data level ajax
         Route::delete('/{id}', [LevelController::class, 'destroy']); // menghapus data level
+
+        // Routes import dengan Ajax untuk Level
+        Route::get('/import', [LevelController::class, 'import']);
+        Route::post('/import_ajax', [LevelController::class, 'import_ajax']);
     });
     
     
@@ -102,6 +110,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/delete_ajax', [KategoriController::class, 'confirm_ajax']); //menampilkan form confirm delete kategori ajax
         Route::delete('/{id}/delete_ajax', [KategoriController::class, 'delete_ajax']); // menghapus data kategori ajax
         Route::delete('/{id}', [KategoriController::class, 'destroy']); // menghapus data kategori
+
+        // Routes import dengan Ajax untuk Kategori
+        Route::get('/import', [KategoriController::class, 'import']);
+        Route::post('/import_ajax', [KategoriController::class, 'import_ajax']);
     });
     
     //route CRUD supplier
@@ -128,6 +140,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/delete_ajax', [SupplierController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [SupplierController::class, 'delete_ajax']);
         Route::delete('/{id}', [SupplierController::class, 'destroy']);
+
+        // Routes import dengan Ajax untuk Supplier
+        Route::get('/import', [SupplierController::class, 'import']);
+        Route::post('/import_ajax', [SupplierController::class, 'import_ajax']);
     });
     
     //route CRUD barang
