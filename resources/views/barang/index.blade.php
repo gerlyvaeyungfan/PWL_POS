@@ -9,12 +9,11 @@
     <div class="card-header">
         <h3 class="card-title">{{ $page->title }}</h3>
         <div class="card-tools">
-            {{-- Tombol hanya muncul jika role user diizinkan oleh middleware --}}
-            @if (in_array($role, ['ADM', 'MNG']))
-                <a class="btn btn-sm btn-primary mt-1" href="{{ url('barang/create') }}">Tambah</a>
-                <button onclick="modalAction('{{ url('barang/create_ajax') }}')" 
-                    class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
-            @endif
+            <button onclick="modalAction('{{ url('/barang/import') }}')" class="btn btn-info">Import Barang</button>
+            <a href="{{ url('/barang/create') }}" class="btn btn-primary">Tambah 
+            Data</a>
+            <button onclick="modalAction('{{ url('/barang/create_ajax') }}')" class="btn 
+            btn-success">Tambah Data (Ajax)</button>
         </div>
     </div>
     <div class="card-body">
@@ -43,7 +42,7 @@
         <table class="table table-bordered table-striped table-hover table-sm" id="table_barang">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>No</th>
                     <th>Kategori</th>
                     <th>Kode</th>
                     <th>Nama</th>
@@ -138,27 +137,7 @@
                 {
                     data: "aksi",
                     orderable: false,
-                    searchable: false,
-                    render: function(data, type, row, meta) {
-                        var role = "{{ $role }}";
-
-                        // Buat elemen sementara dari html tombol yang dikirim server
-                        var $container = $('<div>').html(data);
-
-                        // Ambil tombol detail (misal tombol dengan class btn-info)
-                        var detailBtn = $container.find('.btn-info').prop('outerHTML') || '';
-
-                        // Ambil tombol edit dan hapus (misal btn-warning dan btn-danger)
-                        var editBtn = '';
-                        var hapusBtn = '';
-
-                        if (role === 'ADM' || role === 'MNG') {
-                            editBtn = $container.find('.btn-warning').prop('outerHTML') || '';
-                            hapusBtn = $container.find('.btn-danger').prop('outerHTML') || '';
-                        }
-
-                        return detailBtn + ' ' + editBtn + ' ' + hapusBtn;
-                    }
+                    searchable: false
                 }
             ]
         });

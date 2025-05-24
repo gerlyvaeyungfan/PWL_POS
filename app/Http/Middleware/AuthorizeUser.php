@@ -15,11 +15,19 @@ class AuthorizeUser
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        $user_role = $request->user()->getRole();   // ambil data user yg login
-        if(in_array($user_role, $roles)){  // fungsi user() diambil dari UserModal.php
-            return $next($request); // cek apakah user punya role yg diinginkan
+        $user_role = $request->user()->getRole();
+
+        if (in_array($user_role, $roles)) {
+            return $next($request);
         }
-        // jika tidak punya role, maka tampilkan error 403
-        abort(403, 'Forbidden. Kamu tidak punya akses ke halaman ini');
+
+        // Jika request adalah AJAX (XHR)
+        if (!$request->ajax()) {
+             // Jika bukan AJAX, langsung abort 403 dengan pesan custom
+            abort(403, 'Forbidden. Kamu tidak punya akses ke halaman ini');
+        } else {
+            return response('', 403);
+        }
     }
 }
+
