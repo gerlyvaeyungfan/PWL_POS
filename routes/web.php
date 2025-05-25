@@ -178,6 +178,9 @@ Route::middleware(['auth'])->group(function () {
         // Import dengan Ajax
         Route::get('/import', [BarangController::class, 'import']);
         Route::post('/import_ajax', [BarangController::class, 'import_ajax']);
+
+        // Export excel
+        Route::get('/export_excel', [BarangController::class, 'export_excel']);
     });
    
 });
