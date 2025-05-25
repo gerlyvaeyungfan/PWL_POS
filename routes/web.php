@@ -1,4 +1,4 @@
-=<?php
+<?php
 
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LevelController;
@@ -179,12 +179,11 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}/delete_ajax', [BarangController::class, 'delete_ajax']);
         Route::delete('/{id}', [BarangController::class, 'destroy']);
 
-        // Import dengan Ajax
+        // Routes Import dan Export untuk Barang
         Route::get('/import', [BarangController::class, 'import']);
         Route::post('/import_ajax', [BarangController::class, 'import_ajax']);
-
-        // Export excel
         Route::get('/export_excel', [BarangController::class, 'export_excel']);
+        Route::get('/export_pdf', [BarangController::class, 'export_pdf']);
     });
    
 });
