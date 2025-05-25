@@ -214,6 +214,52 @@ class UserController extends Controller
         return redirect('/');
     }
 
+    public function export_excel()
+    {
+        $user = UserModel::select('username', 'password', 'nama', 'level_id')
+                    ->orderBy('username')
+                    ->with('level')
+                    ->get();
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Username');
+        $sheet->setCellValue('C1', 'Password');
+        $sheet->setCellValue('D1', 'Nama');
+        $sheet->setCellValue('E1', 'Level');
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+
+        $no = 1;
+        $baris = 2;
+        foreach ($user as $value) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $value->username);
+            $sheet->setCellValue('C' . $baris, $value->password);
+            $sheet->setCellValue('D' . $baris, $value->nama);
+            $sheet->setCellValue('E' . $baris, $value->level->level_nama ?? ''); // jika relasi tidak ada
+            $baris++;
+            $no++;
+        }
+
+        foreach (range('A', 'E') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheet->setTitle('Data User');
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data User ' . date('Y-m-d H:i:s') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: public');
+
+        $writer->save('php://output');
+        exit;
+    }
+
     // Menampilkan halaman form edit user Ajax
     public function edit_ajax(string $id)
     {

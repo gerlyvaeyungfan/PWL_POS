@@ -1,4 +1,4 @@
-<?php
+=<?php
 
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LevelController;
@@ -50,9 +50,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [UserController::class, 'destroy']); // menghapus data user
         Route::get('/{id}/show_ajax', [UserController::class, 'showAjax']);
 
-        // Routes import dengan Ajax untuk User
+        // Routes import dan Export untuk User
         Route::get('/import', [UserController::class, 'import']);
         Route::post('/import_ajax', [UserController::class, 'import_ajax']);
+        Route::get('/export_excel', [UserController::class, 'export_excel']);
     });
     
     // route CRUD level
@@ -80,9 +81,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}/delete_ajax', [LevelController::class, 'delete_ajax']); // menghapus data level ajax
         Route::delete('/{id}', [LevelController::class, 'destroy']); // menghapus data level
 
-        // Routes import dengan Ajax untuk Level
+        // Routes import dan Export untuk Level
         Route::get('/import', [LevelController::class, 'import']);
         Route::post('/import_ajax', [LevelController::class, 'import_ajax']);
+        Route::get('/export_excel', [LevelController::class, 'export_excel']);
     });
     
     
@@ -111,9 +113,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}/delete_ajax', [KategoriController::class, 'delete_ajax']); // menghapus data kategori ajax
         Route::delete('/{id}', [KategoriController::class, 'destroy']); // menghapus data kategori
 
-        // Routes import dengan Ajax untuk Kategori
+        // Routes import dan Export untuk Kategori
         Route::get('/import', [KategoriController::class, 'import']);
         Route::post('/import_ajax', [KategoriController::class, 'import_ajax']);
+        Route::get('/export_excel', [KategoriController::class, 'export_excel']);
     });
     
     //route CRUD supplier
@@ -141,9 +144,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}/delete_ajax', [SupplierController::class, 'delete_ajax']);
         Route::delete('/{id}', [SupplierController::class, 'destroy']);
 
-        // Routes import dengan Ajax untuk Supplier
+        // Routes import dan Export untuk Supplier
         Route::get('/import', [SupplierController::class, 'import']);
         Route::post('/import_ajax', [SupplierController::class, 'import_ajax']);
+        Route::get('/export_excel', [SupplierController::class, 'export_excel']);
     });
     
     //route CRUD barang
