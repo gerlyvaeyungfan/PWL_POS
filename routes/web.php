@@ -8,6 +8,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfilController;
 
 Route::pattern('id', '[0-9]+'); // Pastilan parameter {id} hanya berupa angaka
 
@@ -23,6 +24,10 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::middleware(['auth'])->group(function () {
     // artinya semua route di dalam group ini harus login dulu
     Route::get('/', [WelcomeController::class, 'index']);
+
+    Route::get('/profil', [ProfilController::class, 'index']);    // lihat profil
+    Route::get('/profil/edit', [ProfilController::class, 'edit']);   // form edit
+    Route::put('/profil/update', [ProfilController::class, 'update']);    // simpan perubahan
 
     // route CRUD user
     Route::middleware(['authorize:ADM'])->prefix('user')->group(function () {

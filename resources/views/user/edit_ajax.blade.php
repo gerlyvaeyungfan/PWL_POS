@@ -17,7 +17,7 @@
         </div>
     </div>
 @else
-    <form action="{{ url('/user/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit">
+    <form action="{{ url('/user/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -62,6 +62,18 @@
                         <small class="form-text text-muted">Abaikan jika tidak ingin mengubah password</small>
                         <small id="error-password" class="error-text form-text text-danger"></small>
                     </div>
+
+                    <div class="form-group">
+                        <label>Foto Profil</label>
+                        @if($user->foto)
+                            <div class="mt-2">
+                                <img src="{{ url($user->foto) }}" alt="Foto Profil" class="img-thumbnail" style="width: 150px; height: auto;">
+                            </div>
+                        @endif
+                        <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
+                        <small class="form-text text-muted">Abaikan jika tidak ingin mengubah foto</small>
+                        <small id="error-foto" class="error-text text-danger"></small>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -85,7 +97,9 @@
                     $.ajax({
                         url: form.action,
                         type: form.method,
-                        data: $(form).serialize(),
+                        data: new FormData(form),
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             if(response.status) {
                                 $('#myModal').modal('hide');
@@ -125,3 +139,62 @@
         });
     </script>
 @endempty
+<script>
+    $(document).ready(function() {
+        $("#form-edit-profil").validate({
+            rules: {
+                username: { required: true, minlength: 3, maxlength: 20 },
+                nama: { required: true, minlength: 3, maxlength: 100 },
+                password: { minlength: 6, maxlength: 20 },
+                foto: { extension: "jpg|jpeg|png" }
+            },
+            messages: {
+                foto: {
+                    extension: "Format file harus jpg, jpeg, atau png"
+                }
+            },
+            submitHandler: function(form) {
+                $.ajax({
+                    url: form.action,
+                    type: form.method,
+                    data: new FormData(form),
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if(response.status) {
+                            $('#myModal').modal('hide');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: response.message
+                            });
+                            location.reload(); // Atau update data profil di halaman
+                        } else {
+                            $('.error-text').text('');
+                            $.each(response.msgField, function(prefix, val) {
+                                $('#error-' + prefix).text(val[0]);
+                            });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi Kesalahan',
+                                text: response.message
+                            });
+                        }
+                    }
+                });
+                return false;
+            },
+            errorElement: 'span',
+            errorPlacement: function(error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.form-group').append(error);
+            },
+            highlight: function(element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            }
+        });
+    });
+</script>
