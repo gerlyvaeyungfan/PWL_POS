@@ -33,6 +33,11 @@
 
                 <div class="form-group">
                     <label>Foto Profil</label>
+                    @if($user->foto)
+                        <div class="mt-2">
+                            <img src="{{ url($user->foto) }}" alt="Foto Profil" class="img-thumbnail" style="width: 150px; height: auto;">
+                        </div>
+                    @endif
                     <input type="file" name="foto" class="form-control">
                     <span class="text-danger error-text" id="error-foto"></span>
                 </div>
