@@ -1,14 +1,7 @@
 @php
     $activeMenu = $activeMenu ?? 'dashboard';
-    $user = Auth::user();
 @endphp
 <div class="sidebar">
-    <!-- Brand Logo -->
-    <a href="{{ url('/profil') }}" class="brand-link">
-        <img src="{{ asset($user->foto) }}" alt="Foto Profil" class="brand-image" style="filter: invert(1); cursor: pointer;">
-        <span class="brand-text font-weight-light">PWL - Starter Code</span>
-    </a>
-
     <!-- SidebarSearch Form -->
     <div class="form-inline mt-2">
         <div class="input-group" data-widget="sidebar-search">

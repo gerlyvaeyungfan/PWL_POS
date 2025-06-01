@@ -1,3 +1,6 @@
+@php
+    $user = Auth::user();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +32,11 @@
 
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
-
+    <!-- Brand Logo -->
+    <a href="{{ url('/profil') }}" class="brand-link">
+        <img src="{{ asset($user->foto) }}" alt="Foto Profil" class="img-thumbnail" style="width: 30px; height: 30px; border-radius: 50%; padding: 0rem; border: 0px" >
+        <span class="brand-text font-weight-light">{{ $user->nama }}</span>
+    </a>
     <!-- Sidebar -->
     @include('layouts.sidebar')
     <!-- /.sidebar -->

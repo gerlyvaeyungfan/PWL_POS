@@ -1,13 +1,11 @@
-<!-- Modal wrapper -->
-<div id="modal-master" class="modal-dialog modal-md" role="document" style="margin: 100px auto;">
-    <div class="modal-content bg-white">
-        <form id="form-edit-profil" method="POST" action="{{ url('/profil/update') }}" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-
+<form id="form-edit-profil" method="POST" action="{{ url('/profil/update') }}" enctype="multipart/form-data">
+    @csrf
+    @method('PUT')
+    <div id="modal-master" class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit Profil</h5>
-                <button type="button" class="close" id="close-and-redirect" aria-label="Tutup">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Data User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -15,20 +13,21 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" name="username" class="form-control" value="{{ old('username', $user->username) }}">
-                    <span class="text-danger error-text" id="error-username"></span>
+                    <input value="{{ $user->username }}" type="text" name="username" id="username" class="form-control" required>
+                    <small id="error-username" class="error-text form-text text-danger"></small>
                 </div>
 
                 <div class="form-group">
-                    <label>Nama Lengkap</label>
-                    <input type="text" name="nama" class="form-control" value="{{ old('nama', $user->nama) }}">
-                    <span class="text-danger error-text" id="error-nama"></span>
+                    <label>Nama</label>
+                    <input value="{{ $user->nama }}" type="text" name="nama" id="nama" class="form-control" required>
+                    <small id="error-nama" class="error-text form-text text-danger"></small>
                 </div>
 
                 <div class="form-group">
-                    <label>Password (Kosongkan jika tidak diubah)</label>
-                    <input type="password" name="password" class="form-control">
-                    <span class="text-danger error-text" id="error-password"></span>
+                    <label>Password</label>
+                    <input type="password" name="password" id="password" class="form-control">
+                    <small class="form-text text-muted">Abaikan jika tidak ingin mengubah password</small>
+                    <small id="error-password" class="error-text form-text text-danger"></small>
                 </div>
 
                 <div class="form-group">
@@ -38,20 +37,19 @@
                             <img src="{{ url($user->foto) }}" alt="Foto Profil" class="img-thumbnail" style="width: 150px; height: auto;">
                         </div>
                     @endif
-                    <input type="file" name="foto" class="form-control">
-                    <span class="text-danger error-text" id="error-foto"></span>
+                    <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
+                    <small class="form-text text-muted">Abaikan jika tidak ingin mengubah foto</small>
+                    <small id="error-foto" class="error-text text-danger"></small>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="closeModalBtn">Batal</button>
-                <button type="submit" class="btn btn-success">Simpan Perubahan</button>
+                <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
             </div>
-
-        </form>
+        </div>
     </div>
-</div>
-
+    
 <script>
     var currentEditProfilAjax = null;
 
