@@ -51,40 +51,22 @@
     </div>
     
 <script>
-    var currentEditProfilAjax = null;
-
     $(document).ready(function () {
         $("#form-edit-profil").validate({
             rules: {
-                username: {
-                    required: true,
-                    minlength: 3,
-                    maxlength: 20
-                },
-                nama: {
-                    required: true,
-                    minlength: 3,
-                    maxlength: 100
-                },
-                password: {
-                    minlength: 6,
-                    maxlength: 20
-                },
-                foto: {
-                    extension: "jpg|jpeg|png"
-                }
+                username: { required: true, minlength: 3, maxlength: 20 },
+                nama: { required: true, minlength: 3, maxlength: 100 },
+                password: { minlength: 6, maxlength: 20 },
+                foto: { extension: "jpg|jpeg|png", filesize: 2048 }
             },
             messages: {
                 foto: {
-                    extension: "Format file harus jpg, jpeg, atau png"
+                    extension: "Format file harus jpg, jpeg, atau png",
+                    filesize: "Ukuran file maksimal 2MB"
                 }
             },
             submitHandler: function (form) {
-                if (currentEditProfilAjax) {
-                    currentEditProfilAjax.abort();
-                }
-
-                currentEditProfilAjax = $.ajax({
+                $.ajax({
                     url: form.action,
                     type: form.method,
                     data: new FormData(form),
@@ -139,13 +121,13 @@
                 $(element).removeClass('is-invalid');
             }
         });
-
-        $('#closeModalBtn, #close-and-redirect').on('click', function () {
-            if (currentEditProfilAjax) {
-                currentEditProfilAjax.abort();
+        
+        // Custom validator for file size
+        $.validator.addMethod('filesize', function(value, element, param) {
+            if (element.files.length === 0) {
+                return true; // if no file, pass validation
             }
-            $('#myModal').modal('hide');
-            location.reload();
-        });
+            return element.files[0].size <= param * 1024;
+        }, 'File size must be less than {0} KB');
     });
 </script>

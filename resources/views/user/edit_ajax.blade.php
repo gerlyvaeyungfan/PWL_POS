@@ -91,7 +91,14 @@
                     level_id: { required: true, number: true },
                     username: { required: true, minlength: 3, maxlength: 20 },
                     nama: { required: true, minlength: 3, maxlength: 100 },
-                    password: { minlength: 6, maxlength: 20 }
+                    password: { minlength: 6, maxlength: 20 },
+                    foto: { extension: "jpg|jpeg|png",  filesize: 2048 }
+                },
+                messages: {
+                    foto: {
+                        extension: "Format file harus jpg, jpeg, atau png",
+                        filesize: "Ukuran file maksimal 2MB"
+                    }
                 },
                 submitHandler: function(form) {
                     $.ajax({
@@ -136,65 +143,14 @@
                     $(element).removeClass('is-invalid');
                 }
             });
+
+            // Custom validator for file size
+            $.validator.addMethod('filesize', function(value, element, param) {
+                if (element.files.length === 0) {
+                    return true; // if no file, pass validation
+                }
+                return element.files[0].size <= param * 1024;
+            }, 'File size must be less than {0} KB');
         });
     </script>
 @endempty
-<script>
-    $(document).ready(function() {
-        $("#form-edit-profil").validate({
-            rules: {
-                username: { required: true, minlength: 3, maxlength: 20 },
-                nama: { required: true, minlength: 3, maxlength: 100 },
-                password: { minlength: 6, maxlength: 20 },
-                foto: { extension: "jpg|jpeg|png" }
-            },
-            messages: {
-                foto: {
-                    extension: "Format file harus jpg, jpeg, atau png"
-                }
-            },
-            submitHandler: function(form) {
-                $.ajax({
-                    url: form.action,
-                    type: form.method,
-                    data: new FormData(form),
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if(response.status) {
-                            $('#myModal').modal('hide');
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil',
-                                text: response.message
-                            });
-                            location.reload(); // Atau update data profil di halaman
-                        } else {
-                            $('.error-text').text('');
-                            $.each(response.msgField, function(prefix, val) {
-                                $('#error-' + prefix).text(val[0]);
-                            });
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Terjadi Kesalahan',
-                                text: response.message
-                            });
-                        }
-                    }
-                });
-                return false;
-            },
-            errorElement: 'span',
-            errorPlacement: function(error, element) {
-                error.addClass('invalid-feedback');
-                element.closest('.form-group').append(error);
-            },
-            highlight: function(element, errorClass, validClass) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element, errorClass, validClass) {
-                $(element).removeClass('is-invalid');
-            }
-        });
-    });
-</script>

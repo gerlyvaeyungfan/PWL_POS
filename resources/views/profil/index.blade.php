@@ -54,6 +54,9 @@
 </div>
 @endsection
 
+@push('css')
+@endpush
+
 @push('js')
 <script>
     function modalAction(url = '') {
@@ -61,54 +64,5 @@
             $('#myModal').modal('show');
         });
     }
-
-    $(document).ready(function() {
-        $(document).on('shown.bs.modal', '#myModal', function () {
-            initFormEdit();
-        });
-
-        function initFormEdit() {
-            $('#form-edit-profil').validate({
-                rules: {
-                    username: { required: true, minlength: 3, maxlength: 20 },
-                    nama: { required: true, minlength: 3, maxlength: 100 },
-                    password: { minlength: 6, maxlength: 20 },
-                    foto: { extension: "jpg|jpeg|png" }
-                },
-                messages: {
-                    foto: {
-                        extension: "Format file harus jpg, jpeg, atau png"
-                    }
-                },
-                submitHandler: function(form) {
-                    var formData = new FormData(form);
-                    $.ajax({
-                        url: form.action,
-                        type: form.method,
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if(response.status) {
-                                $('#myModal').modal('hide');
-                                toastr.success(response.message);
-                                location.reload();
-                            } else {
-                                $('.error-text').text('');
-                                $.each(response.msgField, function(key, val) {
-                                    $('#error-' + key).text(val[0]);
-                                });
-                                toastr.error(response.message);
-                            }
-                        },
-                        error: function() {
-                            toastr.error('Terjadi kesalahan saat menyimpan data.');
-                        }
-                    });
-                    return false;
-                }
-            });
-        }
-    });
 </script>
 @endpush
