@@ -34,7 +34,7 @@
                     <label>Foto Profil</label>
                     @if($user->foto)
                         <div class="mt-2">
-                            <img src="{{ url($user->foto) }}" alt="Foto Profil" class="img-thumbnail" style="width: 150px; height: auto;">
+                            <img src="{{ asset($user->foto) }}" alt="Foto Profil" class="img-thumbnail" style="width: 150px; height: auto;">
                         </div>
                     @endif
                     <input type="file" name="foto" id="foto" class="form-control" accept="image/*">

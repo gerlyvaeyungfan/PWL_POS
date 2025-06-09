@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\LevelModel;
-use App\Models\User;  // pastikan model User sudah dibuat dan namespace sesuai
 
 class ProfilController extends Controller
 {
@@ -43,6 +42,7 @@ class ProfilController extends Controller
 
     public function update(Request $request)
     {
+        /** @var \App\Models\UserModel $user */
         $user = Auth::user();
 
         $request->validate([
@@ -60,29 +60,31 @@ class ProfilController extends Controller
         }
 
         if ($request->hasFile('foto')) {
-            $this->hapusFotoLama($user->foto);
+            $foto = $request->file('foto');
 
-            $user->foto = $this->uploadFotoBaru($request->file('foto'));
+            // Hapus foto lama
+            if ($user->foto) {
+                $fotoLama = basename($user->foto);
+                $pathLama = storage_path('app/public/posts/' . $fotoLama);
+                if (file_exists($pathLama)) {
+                    @unlink($pathLama);
+                }
+            }
+
+            // Simpan foto baru ke storage/app/public/posts dengan nama hash
+            $foto->storeAs('public/posts', $foto->hashName());
+
+            // Simpan hashName ke DB
+            $user->foto = $foto->hashName();
         }
 
         $user->save();
+
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Profil berhasil diperbarui'
         ]);
     }
 
-    private function hapusFotoLama($fotoPath)
-    {
-        if ($fotoPath && file_exists(public_path($fotoPath))) {
-            unlink(public_path($fotoPath));
-        }
-    }
 
-    private function uploadFotoBaru($file)
-    {
-        $filename = date('YmdHis') . '_' . $file->getClientOriginalName();
-        $file->move(public_path('user_foto'), $filename);
-        return 'user_foto/' . $filename;
-    }
 }
