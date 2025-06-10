@@ -44,16 +44,13 @@
                         <th class="text-right col-3">Nama Lengkap :</th>
                         <td class="col-9">{{ $user->nama }}</td>
                     </tr>
+                    <tr>
+                        <th class="text-right col-3">Foto Profil:</th>
+                        <td class="col-9">
+                            <img src="{{ asset($user->foto) }}" alt="Foto Profil" class="img-thumbnail" style="width: 150px; height: auto;">
+                        </td>
+                    </tr>
                 </table>
-
-                <div class="form-group">
-                    <label>Foto Profil</label>
-                    @if($user->foto)
-                        <img src="{{ asset($user->foto) }}" alt="Foto Profil" class="img-thumbnail" style="width: 150px; height: auto;">
-                    @else
-                        <p>Tidak ada foto profil.</p>
-                    @endif
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" data-dismiss="modal" class="btn btn-secondary">Tutup</button>

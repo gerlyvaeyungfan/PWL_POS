@@ -51,6 +51,12 @@
                         <th class="text-right col-3">Kategori :</th>
                         <td class="col-9">{{ $barang->kategori->kategori_nama ?? '-' }}</td>
                     </tr>
+                    <tr>
+                        <th class="text-right col-3">Foto Barang:</th>
+                        <td class="col-9">
+                            <img src="{{ asset($barang->foto) }}" alt="Foto Barang" class="img-thumbnail" style="width: 150px; height: auto;">
+                        </td>
+                    </tr>
                 </table>
             </div>
             <div class="modal-footer">

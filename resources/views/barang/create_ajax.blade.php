@@ -1,4 +1,4 @@
-<form action="{{ url('/barang/ajax') }}" method="POST" id="form-tambah">
+<form action="{{ url('/barang/ajax') }}" method="POST" id="form-tambah" enctype="multipart/form-data">
     @csrf
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -39,6 +39,11 @@
                     <input value="" type="number" name="harga_jual" id="harga_jual" class="form-control" required>
                     <small id="error-harga_jual" class="error-text text-danger"></small>
                 </div>
+                <div class="form-group">
+                    <label>Foto Barang</label>
+                    <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
+                    <small id="error-foto" class="error-text text-danger"></small>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
@@ -48,37 +53,41 @@
     </div>
 </form>
 
-
 <script>
-    $(document).ready(function() {
-    // Inisialisasi form validasi
+$(document).ready(function() {
     $("#form-tambah").validate({
         rules: {
             kategori_id: { required: true, number: true },
             barang_kode: { required: true, minlength: 3, maxlength: 20 },
             barang_nama: { required: true, minlength: 3, maxlength: 100 },
             harga_beli: { required: true, number: true },
-            harga_jual: { required: true, number: true }
+            harga_jual: { required: true, number: true },
+            foto: { extension: "jpg|jpeg|png", filesize: 2048 }
+        },
+        messages: {
+            foto: {
+                extension: "Format file harus jpg, jpeg, atau png",
+                filesize: "Ukuran file maksimal 2MB"
+            }
         },
         submitHandler: function(form) {
-            // Mengirim data menggunakan AJAX
+            var formData = new FormData(form); // gunakan FormData agar file bisa dikirim
             $.ajax({
-                url: form.action, // URL untuk mengirim data
-                type: form.method, // Method POST
-                data: $(form).serialize(), // Serialize form data
+                url: form.action,
+                type: form.method,
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function(response) {
                     if (response.status) {
-                        // Menutup modal dan memberikan feedback sukses
-                        $('#myModal').modal('hide'); // Pastikan id modal sesuai dengan modal Anda
+                        $('#myModal').modal('hide');
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil',
                             text: response.message
                         });
-                        // Mengupdate data pada DataTable
-                        dataBarang.ajax.reload(); // sesuaikan dengan nama datatable untuk barang
+                        dataBarang.ajax.reload();
                     } else {
-                        // Menampilkan error yang didapat dari response
                         $('.error-text').text('');
                         $.each(response.msgField, function(prefix, val) {
                             $('#error-' + prefix).text(val[0]);
@@ -93,12 +102,12 @@
                 error: function(xhr, status, error) {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Terjadi Kesalahan',
-                        text: 'Gagal mengirim data, silakan coba lagi!'
+                        title: 'Gagal Mengirim',
+                        text: 'Silakan coba lagi nanti.'
                     });
                 }
             });
-            return false; // Mencegah form submit default
+            return false;
         },
         errorElement: 'span',
         errorPlacement: function(error, element) {
@@ -112,5 +121,13 @@
             $(element).removeClass('is-invalid');
         }
     });
+
+    // Tambahkan validator ukuran file
+    $.validator.addMethod('filesize', function(value, element, param) {
+        if (element.files.length === 0) {
+            return true;
+        }
+        return element.files[0].size <= param * 1024;
+    }, 'Ukuran file maksimal {0} KB');
 });
 </script>

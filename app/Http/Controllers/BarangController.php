@@ -63,7 +63,8 @@ class BarangController extends Controller
                 'barang_kode' => 'required|string|unique:m_barang,barang_kode',
                 'barang_nama' => 'required|string|max:100',
                 'harga_beli'  => 'required|numeric',
-                'harga_jual'  => 'required|numeric'
+                'harga_jual'  => 'required|numeric',
+                'foto'        => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ];
 
             $validator = Validator::make($request->all(), $rules);
@@ -76,12 +77,16 @@ class BarangController extends Controller
                 ]);
             }
 
+            $foto = $request->file('foto');
+            $foto->storeAs('public/barang', $foto->hashName());
+
             $barang = BarangModel::create([
                 'kategori_id' => $request->kategori_id,
                 'barang_kode' => $request->barang_kode,
                 'barang_nama' => $request->barang_nama,
                 'harga_beli'  => $request->harga_beli,
                 'harga_jual'  => $request->harga_jual,
+                'foto'        => $foto->hashName(),
             ]);
 
             return response()->json([
@@ -113,7 +118,8 @@ class BarangController extends Controller
                 'barang_kode' => 'required|string|unique:m_barang,barang_kode,' . $id . ',barang_id',
                 'barang_nama' => 'required|string|max:100',
                 'harga_beli'  => 'required|numeric',
-                'harga_jual'  => 'required|numeric'
+                'harga_jual'  => 'required|numeric',
+                'foto'        => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ];
 
             $validator = Validator::make($request->all(), $rules);
@@ -127,25 +133,48 @@ class BarangController extends Controller
             }
 
             $barang = BarangModel::find($id);
-            if ($barang) {
-                $barang->update([
-                    'kategori_id' => $request->kategori_id,
-                    'barang_kode' => $request->barang_kode,
-                    'barang_nama' => $request->barang_nama,
-                    'harga_beli'  => $request->harga_beli,
-                    'harga_jual'  => $request->harga_jual,
-                ]);
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil diupdate'
-                ]);
-            } else {
+            if (!$barang) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Data tidak ditemukan'
                 ]);
             }
+
+            // Proses upload dan hapus foto lama jika ada file baru
+            if ($request->hasFile('foto')) {
+                $foto = $request->file('foto');
+
+                // Hapus foto lama
+                if ($barang->foto) {
+                    $fotoLama = basename($barang->foto);
+                    $pathLama = storage_path('app/public/barang/' . $fotoLama);
+
+                    if (file_exists($pathLama)) {
+                        @unlink($pathLama);
+                    }
+                }
+
+                // Simpan foto baru
+                $foto->storeAs('public/barang', $foto->hashName());
+                $barang->foto = $foto->hashName();
+
+            }
+                
+            $barang->kategori_id = $request->kategori_id;
+            $barang->barang_kode = $request->barang_kode;
+            $barang->barang_nama = $request->barang_nama;
+            $barang->harga_beli  = $request->harga_beli;
+            $barang->harga_jual  = $request->harga_jual;
+
+            $barang->save();
+                
+            return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diupdate',
+                    'reload'  => true
+            ]);
         }
+        return redirect('/');
     }
 
     public function confirm_ajax(string $id)

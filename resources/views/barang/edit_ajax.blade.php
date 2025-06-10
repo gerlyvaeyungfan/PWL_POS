@@ -31,13 +31,6 @@
             </div>
 
             <div class="modal-body">
-                <!-- ID Barang -->
-                <div class="form-group">
-                    <label>ID Barang</label>
-                    <input type="text" name="barang_id" id="barang_id" class="form-control" value="{{ $barang->barang_id }}" required readonly>
-                    <small id="error-barang_id" class="error-text form-text text-danger"></small>
-                </div>
-
                 <!-- Kategori -->
                 <div class="form-group">
                     <label>Kategori</label>
@@ -79,6 +72,20 @@
                     <input type="number" name="harga_jual" id="harga_jual" class="form-control" value="{{ $barang->harga_jual }}" required>
                     <small id="error-harga_jual" class="error-text form-text text-danger"></small>
                 </div>
+
+                <!-- Foto Barang -->
+                <div class="form-group">
+                    <label>Foto Barang</label>
+                    @if($barang->foto)
+                        <div class="mt-2">
+                            <img src="{{ asset($barang->foto) }}" alt="Foto Barang" class="img-thumbnail" style="width: 150px; height: auto;">
+                        </div>
+                    @endif
+                    <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
+                    <small class="form-text text-muted">Abaikan jika tidak ingin mengubah foto</small>
+                    <small id="error-foto" class="error-text text-danger"></small>
+                </div>
+
             </div>
 
             <div class="modal-footer">
@@ -94,25 +101,34 @@
         $("#form-edit").validate({
             rules: {
                 kategori_id: { required: true, number: true },
-                barang_kode: { required: true, minlength: 2, maxlength: 50 },
-                barang_nama: { required: true, minlength: 2, maxlength: 100 },
+                barang_kode: { required: true, minlength: 3, maxlength: 20 },
+                barang_nama: { required: true, minlength: 3, maxlength: 100 },
                 harga_beli: { required: true, number: true },
-                harga_jual: { required: true, number: true }
+                harga_jual: { required: true, number: true },
+                foto: { extension: "jpg|jpeg|png", filesize: 2048 }
+            },
+            messages: {
+                foto: {
+                    extension: "Format file harus jpg, jpeg, atau png",
+                    filesize: "Ukuran file maksimal 2MB"
+                }
             },
             submitHandler: function(form) {
                 $.ajax({
                     url: form.action,
                     type: form.method,
-                    data: $(form).serialize(),
+                    data: new FormData(form),
+                    processData: false,
+                    contentType: false,
                     success: function(response) {
-                        if (response.status) {
+                        if(response.status) {
                             $('#myModal').modal('hide');
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil',
                                 text: response.message
                             });
-                            dataBarang.ajax.reload(); // sesuaikan dengan nama datatable untuk barang
+                            dataBarang.ajax.reload();
                         } else {
                             $('.error-text').text('');
                             $.each(response.msgField, function(prefix, val) {
@@ -140,6 +156,14 @@
                 $(element).removeClass('is-invalid');
             }
         });
+
+        // Custom validator for file size
+        $.validator.addMethod('filesize', function(value, element, param) {
+            if (element.files.length === 0) {
+                return true; // if no file, pass validation
+            }
+            return element.files[0].size <= param * 1024;
+        }, 'Ukuran file maksimal {0} KB');
     });
 </script>
 @endempty
